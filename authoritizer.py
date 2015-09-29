@@ -41,11 +41,22 @@ class StartQT4(QtGui.QMainWindow):
             self.ui.actionRun_matching.setEnabled(True)
 
     def runMatching(self):
-        all_scores = dict()
+        self.all_scores = dict()
         for m in self.mess:
             scores = [ [x, jellyfish.jaro_winkler(m, unicode(x))] for x in self.authorities]
             scores = sorted(scores, key=lambda score: -score[1])[0:9]
-            all_scores[m] = scores
+            self.all_scores[m] = scores
+
+        self.updateTable()
+
+    def updateTable(self):
+        self.ui.match_table.setRowCount(len(self.all_scores))
+        len_table = len(self.all_scores)
+        keys = self.all_scores.keys()
+
+        for row in range(len_table):
+            self.ui.match_table.setItem(row, 0, QtGui.QTableWidgetItem(keys[row]))
+
 
         # update table
 
