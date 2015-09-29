@@ -262,8 +262,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionImport_CSV"/>
-    <addaction name="actionImport_Messy_Terms"/>
+    <addaction name="actionImport_auth"/>
+    <addaction name="actionImport_messy"/>
     <addaction name="separator"/>
     <addaction name="actionOpen_Project"/>
     <addaction name="actionSave_Project"/>
@@ -293,7 +293,7 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionImport_CSV">
+  <action name="actionImport_auth">
    <property name="text">
     <string>Import Authorities...</string>
    </property>
@@ -337,7 +337,7 @@
     <string>Preferences...</string>
    </property>
   </action>
-  <action name="actionImport_Messy_Terms">
+  <action name="actionImport_messy">
    <property name="text">
     <string>Import Nonstandard Terms...</string>
    </property>

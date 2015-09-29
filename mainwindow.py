@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Mon Sep 28 15:19:42 2015
+# Created: Mon Sep 28 18:28:46 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -119,8 +119,8 @@ class Ui_MainWindow(object):
         self.statusBar = QtGui.QStatusBar(MainWindow)
         self.statusBar.setObjectName(_fromUtf8("statusBar"))
         MainWindow.setStatusBar(self.statusBar)
-        self.actionImport_CSV = QtGui.QAction(MainWindow)
-        self.actionImport_CSV.setObjectName(_fromUtf8("actionImport_CSV"))
+        self.actionImport_auth = QtGui.QAction(MainWindow)
+        self.actionImport_auth.setObjectName(_fromUtf8("actionImport_auth"))
         self.actionExport_CSV = QtGui.QAction(MainWindow)
         self.actionExport_CSV.setObjectName(_fromUtf8("actionExport_CSV"))
         self.actionSave_Project = QtGui.QAction(MainWindow)
@@ -136,13 +136,13 @@ class Ui_MainWindow(object):
         self.actionPreferences = QtGui.QAction(MainWindow)
         self.actionPreferences.setEnabled(False)
         self.actionPreferences.setObjectName(_fromUtf8("actionPreferences"))
-        self.actionImport_Messy_Terms = QtGui.QAction(MainWindow)
-        self.actionImport_Messy_Terms.setObjectName(_fromUtf8("actionImport_Messy_Terms"))
+        self.actionImport_messy = QtGui.QAction(MainWindow)
+        self.actionImport_messy.setObjectName(_fromUtf8("actionImport_messy"))
         self.actionRun_matching = QtGui.QAction(MainWindow)
         self.actionRun_matching.setEnabled(False)
         self.actionRun_matching.setObjectName(_fromUtf8("actionRun_matching"))
-        self.menuFile.addAction(self.actionImport_CSV)
-        self.menuFile.addAction(self.actionImport_Messy_Terms)
+        self.menuFile.addAction(self.actionImport_auth)
+        self.menuFile.addAction(self.actionImport_messy)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionOpen_Project)
         self.menuFile.addAction(self.actionSave_Project)
@@ -195,13 +195,13 @@ class Ui_MainWindow(object):
         self.select_label.setText(_translate("MainWindow", "Select authority for \"\"", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuRun.setTitle(_translate("MainWindow", "Run", None))
-        self.actionImport_CSV.setText(_translate("MainWindow", "Import Authorities...", None))
+        self.actionImport_auth.setText(_translate("MainWindow", "Import Authorities...", None))
         self.actionExport_CSV.setText(_translate("MainWindow", "Export CSV...", None))
         self.actionSave_Project.setText(_translate("MainWindow", "Save Project...", None))
         self.actionOpen_Project.setText(_translate("MainWindow", "Open Project...", None))
         self.actionClose_Project.setText(_translate("MainWindow", "Close Project", None))
         self.actionQuit.setText(_translate("MainWindow", "Quit", None))
         self.actionPreferences.setText(_translate("MainWindow", "Preferences...", None))
-        self.actionImport_Messy_Terms.setText(_translate("MainWindow", "Import Nonstandard Terms...", None))
+        self.actionImport_messy.setText(_translate("MainWindow", "Import Nonstandard Terms...", None))
         self.actionRun_matching.setText(_translate("MainWindow", "Match...", None))
 
