@@ -45,10 +45,13 @@ class StartQT4(QtGui.QMainWindow):
 
     def runMatching(self):
         self.all_scores = list()
+        self.matched_authorities = list()
+
         for m in self.mess:
             scores = [ [x, jellyfish.jaro_winkler(m, unicode(x))] for x in self.authorities]
             scores = sorted(scores, key=lambda score: -score[1])[0:10]
             self.all_scores.append(scores)
+            self.matched_authorities.append(scores[0][0] if scores[0][1] > 0.6 else None)
 
         self.updateTable()
 
@@ -57,14 +60,11 @@ class StartQT4(QtGui.QMainWindow):
 
         for row in range(len(self.all_scores)):
             self.ui.match_table.setItem(row, 0, QtGui.QTableWidgetItem(self.mess[row]))
-            if self.all_scores[row][0][1] > 0.6:
-                self.ui.match_table.setItem(row, 1, QtGui.QTableWidgetItem(self.all_scores[row][0][0]))
+            if self.matched_authorities[row]:
+                self.ui.match_table.setItem(row, 1, QtGui.QTableWidgetItem(self.matched_authorities[row]))
 
     def updateTopHits(self, row, column):
         self.ui.tophit_list.clear()
-        # print "row {}".format(row)
-        # print "\n"
-        # print self.all_scores[row]
         for i in range(10):
             item = QtGui.QListWidgetItem(self.all_scores[row][i][0])
             self.ui.tophit_list.addItem(item)
