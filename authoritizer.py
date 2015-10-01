@@ -20,7 +20,7 @@ class StartQT4(QtGui.QMainWindow):
 
         self.ui.match_table.cellClicked.connect(self.updateTopHits)
 
-        self.ui.ok_button.clicked.connect(self.updateMatch)
+        # self.ui.ok_button.clicked.connect(self.updateMatch)
 
 
     def importAuth(self):
