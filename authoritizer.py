@@ -21,6 +21,8 @@ class StartQT4(QtGui.QMainWindow):
 
         self.ui.match_table.currentCellChanged.connect(self.updateTopHits)
 
+        self.ui.tophit_list.itemDoubleClicked.connect(self.clickAssign)
+
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
 
@@ -58,11 +60,10 @@ class StartQT4(QtGui.QMainWindow):
         self.updateTable()
 
     def updateTable(self):
-        self.ui.match_table.clearContents()
-
-        for row in range(len(self.all_scores)):
+        for row in range(len(self.mess)):
             self.ui.match_table.setItem(row, 0, QtGui.QTableWidgetItem(self.mess[row]))
             if isinstance(self.matched_authorities[row], basestring):
+                # print "{} in row {}".format(self.matched_authorities[row], row)
                 self.ui.match_table.setItem(row, 1, QtGui.QTableWidgetItem(self.matched_authorities[row]))
 
     def updateTopHits(self, row, column, oldrow, oldcolumn):
@@ -72,14 +73,19 @@ class StartQT4(QtGui.QMainWindow):
             self.ui.tophit_list.addItem(item)
 
         self.current_row = row
-        print "now at row {}".format(self.current_row)
         
-
-
+    def clickAssign(self, item):
+        self.matched_authorities[self.current_row] = item.text()
+        print "trying to put {} into row {}".format(self.matched_authorities[self.current_row], self.current_row)
+        self.ui.match_table.setItem(self.current_row, 1, QtGui.QTableWidgetItem(self.matched_authorities[self.current_row]))
+        # self.updateTable()
 
     def deleteMatch(self):
-        print "trying to delete row {}".format(self.current_row)
         self.matched_authorities[self.current_row] = False
+
+        # there doesn't seem to be any way to clear a single cell (?!?)
+        # so clear the entire table before re-rendering it
+        self.ui.match_table.clearContents()
         self.updateTable()
 
 
