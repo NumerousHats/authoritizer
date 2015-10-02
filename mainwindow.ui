@@ -106,111 +106,22 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QRadioButton" name="selectauth_rb">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>40</y>
-      <width>204</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Select authority from top hits</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup</string>
-    </attribute>
-   </widget>
-   <widget class="QRadioButton" name="createauth_rb">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>330</y>
-      <width>164</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Create a new authority</string>
-    </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup</string>
-    </attribute>
-   </widget>
-   <widget class="QRadioButton" name="deleteauth_rb">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>410</y>
-      <width>170</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Delete current authority</string>
-    </property>
-    <attribute name="buttonGroup">
-     <string notr="true">buttonGroup</string>
-    </attribute>
-   </widget>
-   <widget class="QDialogButtonBox" name="buttonBox">
-    <property name="geometry">
-     <rect>
-      <x>900</x>
-      <y>450</y>
-      <width>164</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="standardButtons">
-     <set>QDialogButtonBox::Ok</set>
-    </property>
-   </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>740</x>
-      <y>360</y>
-      <width>177</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>750</x>
-      <y>70</y>
-      <width>308</width>
-      <height>194</height>
+      <y>40</y>
+      <width>321</width>
+      <height>426</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Double-click to assign authority:</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      </widget>
      </item>
      <item>
       <widget class="QListWidget" name="tophit_list">
@@ -218,6 +129,64 @@
         <font>
          <pointsize>16</pointsize>
         </font>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Create new authority:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="new_authority">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="createAuthority_button">
+         <property name="text">
+          <string>Create</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="deleteAuthority_button">
+       <property name="text">
+        <string>Delete authority assignment</string>
        </property>
       </widget>
      </item>
@@ -328,7 +297,24 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>new_authority</sender>
+   <signal>returnPressed()</signal>
+   <receiver>createAuthority_button</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>922</x>
+     <y>387</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1011</x>
+     <y>395</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <buttongroups>
   <buttongroup name="buttonGroup"/>
  </buttongroups>

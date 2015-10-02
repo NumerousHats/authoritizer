@@ -20,7 +20,7 @@ class StartQT4(QtGui.QMainWindow):
 
         self.ui.match_table.cellClicked.connect(self.updateTopHits)
 
-        # self.ui.ok_button.clicked.connect(self.updateMatch)
+        self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
 
     def importAuth(self):
@@ -72,7 +72,7 @@ class StartQT4(QtGui.QMainWindow):
 
 
 
-    def updateMatch(self):
+    def deleteMatch(self):
         print "Yowza!!"
 
 
