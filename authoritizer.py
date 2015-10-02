@@ -4,6 +4,7 @@ from mainwindow import Ui_MainWindow
 
 import jellyfish
 import pandas as pd
+import numpy as np
 
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -51,16 +52,17 @@ class StartQT4(QtGui.QMainWindow):
             scores = [ [x, jellyfish.jaro_winkler(m, unicode(x))] for x in self.authorities]
             scores = sorted(scores, key=lambda score: -score[1])[0:10]
             self.all_scores.append(scores)
-            self.matched_authorities.append(scores[0][0] if scores[0][1] > 0.6 else None)
+            self.matched_authorities.append(scores[0][0] if scores[0][1] > 0.6 else False)
 
+        self.ui.match_table.setRowCount(len(self.mess))
         self.updateTable()
 
     def updateTable(self):
-        self.ui.match_table.setRowCount(len(self.mess))
+        self.ui.match_table.clearContents()
 
         for row in range(len(self.all_scores)):
             self.ui.match_table.setItem(row, 0, QtGui.QTableWidgetItem(self.mess[row]))
-            if self.matched_authorities[row]:
+            if isinstance(self.matched_authorities[row], basestring):
                 self.ui.match_table.setItem(row, 1, QtGui.QTableWidgetItem(self.matched_authorities[row]))
 
     def updateTopHits(self, row, column, oldrow, oldcolumn):
@@ -77,7 +79,7 @@ class StartQT4(QtGui.QMainWindow):
 
     def deleteMatch(self):
         print "trying to delete row {}".format(self.current_row)
-        self.matched_authorities[self.current_row] = "baloney"
+        self.matched_authorities[self.current_row] = False
         self.updateTable()
 
 
