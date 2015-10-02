@@ -62,8 +62,7 @@ class StartQT4(QtGui.QMainWindow):
     def updateTable(self):
         for row in range(len(self.mess)):
             self.ui.match_table.setItem(row, 0, QtGui.QTableWidgetItem(self.mess[row]))
-            if isinstance(self.matched_authorities[row], basestring):
-                # print "{} in row {}".format(self.matched_authorities[row], row)
+            if self.matched_authorities[row]:
                 self.ui.match_table.setItem(row, 1, QtGui.QTableWidgetItem(self.matched_authorities[row]))
 
     def updateTopHits(self, row, column, oldrow, oldcolumn):
@@ -72,13 +71,12 @@ class StartQT4(QtGui.QMainWindow):
             item = QtGui.QListWidgetItem(self.all_scores[row][i][0])
             self.ui.tophit_list.addItem(item)
 
-        self.current_row = row
+        if row != -1: # row gets set to -1 after deleteMatch(): ignore it and keep the old current_run
+            self.current_row = row
         
     def clickAssign(self, item):
         self.matched_authorities[self.current_row] = item.text()
-        print "trying to put {} into row {}".format(self.matched_authorities[self.current_row], self.current_row)
-        self.ui.match_table.setItem(self.current_row, 1, QtGui.QTableWidgetItem(self.matched_authorities[self.current_row]))
-        # self.updateTable()
+        self.updateTable()
 
     def deleteMatch(self):
         self.matched_authorities[self.current_row] = False
@@ -87,6 +85,7 @@ class StartQT4(QtGui.QMainWindow):
         # so clear the entire table before re-rendering it
         self.ui.match_table.clearContents()
         self.updateTable()
+        self.ui.match_table.setCurrentCell(self.current_row, 0)
 
 
 
