@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Thu Oct  1 22:03:50 2015
+# Created: Thu Oct  1 22:09:55 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -68,7 +68,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.label)
         self.tophit_list = QtGui.QListWidget(self.widget)
         font = QtGui.QFont()
-        font.setPointSize(16)
+        font.setPointSize(14)
         self.tophit_list.setFont(font)
         self.tophit_list.setObjectName(_fromUtf8("tophit_list"))
         self.verticalLayout.addWidget(self.tophit_list)

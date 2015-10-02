@@ -18,7 +18,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.actionRun_matching.triggered.connect(self.runMatching)
         self.ui.actionQuit.triggered.connect(QtCore.QCoreApplication.instance().quit)
 
-        self.ui.match_table.cellClicked.connect(self.updateTopHits)
+        self.ui.match_table.currentCellChanged.connect(self.updateTopHits)
 
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
@@ -63,17 +63,22 @@ class StartQT4(QtGui.QMainWindow):
             if self.matched_authorities[row]:
                 self.ui.match_table.setItem(row, 1, QtGui.QTableWidgetItem(self.matched_authorities[row]))
 
-    def updateTopHits(self, row, column):
+    def updateTopHits(self, row, column, oldrow, oldcolumn):
         self.ui.tophit_list.clear()
         for i in range(10):
             item = QtGui.QListWidgetItem(self.all_scores[row][i][0])
             self.ui.tophit_list.addItem(item)
+
+        self.current_row = row
+        print "now at row {}".format(self.current_row)
         
 
 
 
     def deleteMatch(self):
-        print "Yowza!!"
+        print "trying to delete row {}".format(self.current_row)
+        self.matched_authorities[self.current_row] = "baloney"
+        self.updateTable()
 
 
 
