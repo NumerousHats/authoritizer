@@ -4,7 +4,6 @@ from mainwindow import Ui_MainWindow
 
 import jellyfish
 import pandas as pd
-import numpy as np
 
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -23,6 +22,7 @@ class StartQT4(QtGui.QMainWindow):
 
         self.ui.tophit_list.itemDoubleClicked.connect(self.clickAssign)
 
+        self.ui.createAuthority_button.clicked.connect(self.createAuth)
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
 
@@ -34,7 +34,7 @@ class StartQT4(QtGui.QMainWindow):
         self.have_auth = True
 
         if self.have_auth and self.have_mess:
-            self.ui.actionRun_matching.setEnabled(self, True)
+            self.ui.actionRun_matching.setEnabled(True)
 
     def importMessy(self):
         df = pd.read_csv("testdat/huge_real_life.csv")
@@ -77,6 +77,11 @@ class StartQT4(QtGui.QMainWindow):
     def clickAssign(self, item):
         self.matched_authorities[self.current_row] = item.text()
         self.updateTable()
+
+    def createAuth(self):
+        self.matched_authorities[self.current_row] = self.ui.new_authority.text()
+        self.updateTable()
+
 
     def deleteMatch(self):
         self.matched_authorities[self.current_row] = False
