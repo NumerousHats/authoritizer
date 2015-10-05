@@ -1,6 +1,7 @@
 import sys
 from PyQt4 import QtCore, QtGui
 from mainwindow import Ui_MainWindow
+from rundialog import Ui_Dialog
 
 import jellyfish
 import pandas as pd
@@ -16,6 +17,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.actionImport_auth.triggered.connect(self.importAuth)
         self.ui.actionImport_messy.triggered.connect(self.importMessy)
         self.ui.actionRun_matching.triggered.connect(self.runMatching)
+        # self.ui.actionExport_CSV.triggered.connect(self.exportCSV)
         self.ui.actionQuit.triggered.connect(QtCore.QCoreApplication.instance().quit)
 
         self.ui.match_table.currentCellChanged.connect(self.updateTopHits)
@@ -24,7 +26,6 @@ class StartQT4(QtGui.QMainWindow):
 
         self.ui.createAuthority_button.clicked.connect(self.createAuth)
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
-
 
     def importAuth(self):
         df = pd.read_csv("testdat/huge_real_life.csv")
@@ -47,6 +48,15 @@ class StartQT4(QtGui.QMainWindow):
             self.ui.actionRun_matching.setEnabled(True)
 
     def runMatching(self):
+        dlg = StartRunDialog() 
+        if dlg.exec_(): 
+            values = dlg.getValues() 
+            print "dialog got: {}".format(values)
+        else:
+            return
+
+        # return # short-circuit the rest for debugging purposes
+
         self.all_scores = list()
         self.matched_authorities = list()
 
@@ -92,6 +102,20 @@ class StartQT4(QtGui.QMainWindow):
         self.updateTable()
         self.ui.match_table.setCurrentCell(self.current_row, 0)
 
+class StartRunDialog(QtGui.QDialog, Ui_Dialog):
+    def __init__(self,parent=None):
+        QtGui.QDialog.__init__(self,parent)
+        self.setupUi(self)
+
+    def getValues(self):
+        button_function_map = {"lev_rb":jellyfish.levenshtein_distance, "damlev_rb":jellyfish.damerau_levenshtein_distance, 
+                                "jaro_rb":jellyfish.jaro_distance, "jarowink_rb":jellyfish.jaro_winkler, 
+                                "mrac_rb":jellyfish.match_rating_comparison}
+
+        # for button in key(button_function_map):
+            #check if button is selected, and return function
+
+        return "No button matched. This is not supposed to happen!!!"
 
 
 
@@ -100,3 +124,4 @@ if __name__ == "__main__":
     myapp = StartQT4()
     myapp.show()
     sys.exit(app.exec_())
+

@@ -11,9 +11,9 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Match...</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -123,19 +123,42 @@
     </item>
    </layout>
   </widget>
-  <zorder>runcancel_button</zorder>
-  <zorder>runrun_button</zorder>
-  <zorder>lev_rb</zorder>
-  <zorder>damlev_rb</zorder>
-  <zorder>jaro_rb</zorder>
-  <zorder>jarowink_rb</zorder>
-  <zorder>mrac_rb</zorder>
-  <zorder>runrun_button</zorder>
-  <zorder>horizontalSpacer</zorder>
-  <zorder>label</zorder>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>runrun_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>235</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>356</x>
+     <y>163</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>runcancel_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>38</x>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <buttongroups>
   <buttongroup name="buttonGroup"/>
  </buttongroups>
