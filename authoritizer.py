@@ -28,20 +28,33 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
     def importAuth(self):
-        df = pd.read_csv("testdat/huge_real_life.csv")
-        self.authorities = df['canonical firm'].dropna().values.tolist()
-        self.authorities = list(set(self.authorities))
-        self.authorities = [unicode(x) for x in self.authorities]
+        # df = pd.read_csv("testdat/huge_real_life.csv")
+        # self.authorities = df['canonical firm'].dropna().values.tolist()
+        # self.authorities = list(set(self.authorities))
+        # self.authorities = [unicode(x) for x in self.authorities]
+
+        self.authorities = ["Aaronson Rappaport", "Adams Reese", "Adelson Testan", "Adler Pollock", "Ahlers Cooney",
+                            "Ahmuty Demers", "Akerman", "Akin Gump", "Allen Kopet", "Allen Matkins", "Alston Bird",
+                            "Alston Hunt", "Alvarado Smith", "Anderson Kill", "Andrews Kurth", "Archer Greiner",
+                            "Archer Norris", "Arent Fox", "Armstrong Teasdale", "Arnall Golden", "Arnold Porter",
+                            "Arnstein Lehr", "Arthur Chapman"]
+
         self.have_auth = True
 
         if self.have_auth and self.have_mess:
             self.ui.actionRun_matching.setEnabled(True)
 
     def importMessy(self):
-        df = pd.read_csv("testdat/huge_real_life.csv")
-        self.mess = df['vendor'].dropna().values.tolist()
-        self.mess = list(set(self.mess))
-        self.mess = [unicode(x) for x in self.mess]
+        # df = pd.read_csv("testdat/huge_real_life.csv")
+        # self.mess = df['vendor'].dropna().values.tolist()
+        # self.mess = list(set(self.mess))
+        # self.mess = [unicode(x) for x in self.mess]
+
+        self.mess = ["Akerman", "Akin Gump Something Something Else", "Whatsa", "Allen Thingy", "Alston Bird",
+                        "Alston Hunter", "Alvarado Gracioso", "Anderson Killer", "Andrews Girth", "Archer Greiner",
+                        "Archer Norris Joe & Bob", "Aberrant Fox", "Armstrong Teasdale", "Arnall Golden Dawn",
+                        "Arnold Porter"]
+
         self.have_mess = True
 
         if self.have_auth and self.have_mess:
