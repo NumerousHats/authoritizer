@@ -31,13 +31,15 @@ class StartQT4(QtGui.QMainWindow):
         # df = pd.read_csv("testdat/huge_real_life.csv")
         # self.authorities = df['canonical firm'].dropna().values.tolist()
         # self.authorities = list(set(self.authorities))
-        # self.authorities = [unicode(x) for x in self.authorities]
-
+        
         self.authorities = ["Aaronson Rappaport", "Adams Reese", "Adelson Testan", "Adler Pollock", "Ahlers Cooney",
                             "Ahmuty Demers", "Akerman", "Akin Gump", "Allen Kopet", "Allen Matkins", "Alston Bird",
                             "Alston Hunt", "Alvarado Smith", "Anderson Kill", "Andrews Kurth", "Archer Greiner",
                             "Archer Norris", "Arent Fox", "Armstrong Teasdale", "Arnall Golden", "Arnold Porter",
                             "Arnstein Lehr", "Arthur Chapman"]
+
+        self.authorities = [unicode(x) for x in self.authorities]
+
 
         self.have_auth = True
 
@@ -54,6 +56,8 @@ class StartQT4(QtGui.QMainWindow):
                         "Alston Hunter", "Alvarado Gracioso", "Anderson Killer", "Andrews Girth", "Archer Greiner",
                         "Archer Norris Joe & Bob", "Aberrant Fox", "Armstrong Teasdale", "Arnall Golden Dawn",
                         "Arnold Porter"]
+
+        self.mess = [unicode(x) for x in self.mess]
 
         self.have_mess = True
 
