@@ -11,6 +11,7 @@ class StartQT4(QtGui.QMainWindow):
         QtGui.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
         self.have_auth = False
         self.have_mess = False
 
@@ -50,23 +51,22 @@ class StartQT4(QtGui.QMainWindow):
     def runMatching(self):
         dlg = StartRunDialog() 
         if dlg.exec_(): 
-            values = dlg.getValues() 
-            print "dialog got: {}".format(values)
+            match_function = dlg.getValues() 
+            # print "dialog got: {}".format(values)
         else:
             return
-
-        # return # short-circuit the rest for debugging purposes
 
         self.all_scores = list()
         self.matched_authorities = list()
 
-        for m in self.mess:
-            scores = [ [x, jellyfish.jaro_winkler(m, unicode(x))] for x in self.authorities]
+        for m in self.mess: # ideally, we want a progress bar for this loop
+            scores = [ [x, match_function(m, unicode(x))] for x in self.authorities]
             scores = sorted(scores, key=lambda score: -score[1])[0:10]
             self.all_scores.append(scores)
             self.matched_authorities.append(scores[0][0] if scores[0][1] > 0.6 else False)
 
         self.ui.match_table.setRowCount(len(self.mess))
+        self.ui.match_table.clearContents()
         self.updateTable()
 
     def updateTable(self):
@@ -107,16 +107,32 @@ class StartRunDialog(QtGui.QDialog, Ui_Dialog):
         QtGui.QDialog.__init__(self,parent)
         self.setupUi(self)
 
+        self.lev_rb.toggled.connect(self.levToggled)
+        self.damlev_rb.toggled.connect(self.damlevToggled)
+        self.jaro_rb.toggled.connect(self.jaroToggled)
+        self.jarowink_rb.toggled.connect(self.jarowinkToggled)
+        self.mrac_rb.toggled.connect(self.mracToggled)
+
+        self.jarowink_rb.click() # to make sure an event is generated for default
+
+    def levToggled(self, state):
+        if state:
+            self.distfun = jellyfish.levenshtein_distance
+    def damlevToggled(self, state):
+        if state:
+            self.distfun = jellyfish.damerau_levenshtein_distance
+    def jaroToggled(self, state):
+        if state:
+            self.distfun = jellyfish.jaro_distance
+    def jarowinkToggled(self, state):
+        if state:
+            self.distfun = jellyfish.jaro_winkler
+    def mracToggled(self, state):
+        if state:
+            self.distfun = jellyfish.match_rating_comparison
+
     def getValues(self):
-        button_function_map = {"lev_rb":jellyfish.levenshtein_distance, "damlev_rb":jellyfish.damerau_levenshtein_distance, 
-                                "jaro_rb":jellyfish.jaro_distance, "jarowink_rb":jellyfish.jaro_winkler, 
-                                "mrac_rb":jellyfish.match_rating_comparison}
-
-        # for button in key(button_function_map):
-            #check if button is selected, and return function
-
-        return "No button matched. This is not supposed to happen!!!"
-
+        return self.distfun
 
 
 if __name__ == "__main__":

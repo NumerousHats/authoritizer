@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'rundialog.ui'
 #
-# Created: Sun Oct  4 22:07:08 2015
+# Created: Mon Oct  5 13:41:32 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -39,6 +39,7 @@ class Ui_Dialog(object):
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.lev_rb = QtGui.QRadioButton(self.layoutWidget)
+        self.lev_rb.setChecked(True)
         self.lev_rb.setObjectName(_fromUtf8("lev_rb"))
         self.buttonGroup = QtGui.QButtonGroup(Dialog)
         self.buttonGroup.setObjectName(_fromUtf8("buttonGroup"))
@@ -53,7 +54,7 @@ class Ui_Dialog(object):
         self.buttonGroup.addButton(self.jaro_rb)
         self.verticalLayout.addWidget(self.jaro_rb)
         self.jarowink_rb = QtGui.QRadioButton(self.layoutWidget)
-        self.jarowink_rb.setChecked(True)
+        self.jarowink_rb.setChecked(False)
         self.jarowink_rb.setObjectName(_fromUtf8("jarowink_rb"))
         self.buttonGroup.addButton(self.jarowink_rb)
         self.verticalLayout.addWidget(self.jarowink_rb)
