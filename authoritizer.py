@@ -1,8 +1,10 @@
 import sys
 from PyQt4 import QtCore, QtGui
 from mainwindow import Ui_MainWindow
+from selectcolumn import Ui_SelectcolsDialog
 from rundialog import Ui_Dialog
-from importauthority import Ui_ImportAuthDialog
+
+import os
 
 import jellyfish
 import pandas as pd
@@ -31,16 +33,58 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
     def importAuth(self):
-        dlg = StartImportAuthDialog()
-        if dlg.exec_():
-            print "bong!"
+        fname = str(QtGui.QFileDialog.getOpenFileName(self, "Open file", "~"))
+        filename, file_extension = os.path.splitext(fname)
+
+        if file_extension == ".csv":
+            csv_fileh = open(fname, 'rU')
+            try:
+                dialect = csv.Sniffer().sniff(csv_fileh.read(1024))
+                csv_fileh.seek(0)
+                reader = csv.DictReader(csv_fileh, dialect=dialect)
+                self.header = reader.next().keys()
+            except csv.Error:
+                QtGui.QMessageBox.warning(self, 'Warning', 'File does not appear to be valid CSV')
+                return
+
+            # it's okay, so reopen the file and pass reader to column selector dialog
+
+            csv_fileh.close()
+            csv_fileh = open(fname, 'rU')
+            self.reader = csv.DictReader(csv_fileh, dialect=dialect)
+
+            dlg = StartSelectColumns()
+            if dlg.exec_(): 
+                pass
+                # print "dialog got: {}".format(values)
+            else:
+                return
+
+            # self.column_list.setEnabled(True)
+            # self.column_list.clear()
+            # for i in range(len(colnames)):
+            #     item = QtGui.QListWidgetItem(colnames[i])
+            #     self.column_list.addItem(item)
+            
+
+
+
+        elif file_extension == ".txt":
+            QtGui.QMessageBox.information(self, 'Information', 'You got yourself a text file!')
+        elif file_extension == ".xlsx":
+            QtGui.QMessageBox.information(self, 'Information', 'You got yourself a Excel XML file!')
+        elif file_extension == ".xls":
+            QtGui.QMessageBox.information(self, 'Information', 'You got yourself an old-fashioned Excel file!')
         else:
+            QtGui.QMessageBox.warning(self, 'Warning', 'I have no idea what that file is!')
             return
 
-        df = pd.read_csv("testdat/huge_real_life.csv")
-        self.authorities = df['canonical firm'].dropna().values.tolist()
-        self.authorities = list(set(self.authorities))
-        self.authorities = [unicode(x) for x in self.authorities]
+        
+
+        return
+
+
+
         self.have_auth = True
 
         if self.have_auth and self.have_mess:
@@ -68,7 +112,7 @@ class StartQT4(QtGui.QMainWindow):
         self.matched_authorities = list()
 
         for m in self.mess: # ideally, we want a progress bar for this loop
-            scores = [ [x, match_function(m, unicode(x))] for x in self.authorities]
+            scores = [ [x, match_function(m, unicode(x))] for x in self.authorities ]
             scores = sorted(scores, key=lambda score: -score[1])[0:10]
             self.all_scores.append(scores)
             self.matched_authorities.append(scores[0][0] if scores[0][1] > 0.6 else False)
@@ -100,7 +144,6 @@ class StartQT4(QtGui.QMainWindow):
         self.matched_authorities[self.current_row] = self.ui.new_authority.text()
         self.updateTable()
 
-
     def deleteMatch(self):
         self.matched_authorities[self.current_row] = False
 
@@ -110,44 +153,13 @@ class StartQT4(QtGui.QMainWindow):
         self.updateTable()
         self.ui.match_table.setCurrentCell(self.current_row, 0)
 
-class StartImportAuthDialog(QtGui.QDialog, Ui_ImportAuthDialog):
+class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
     def __init__(self,parent=None):
         QtGui.QDialog.__init__(self,parent)
         self.setupUi(self)
 
-        self.selectfile_button.clicked.connect(self.showDialog)
-        self.column_list.itemClicked.connect(self.activateButtons)
-
-    def showDialog(self):
-        fname = QtGui.QFileDialog.getOpenFileName(self, "Open file", "~")
-
-        def __read_data(path):
-            with open(path, 'rU') as data:
-                reader = csv.DictReader(data)
-                for row in reader:
-                    yield row
-
-        try:
-            colnames = __read_data(fname).next().keys()
-        except:
-            print "Yow! READ FAILED!"
-            return
-
-        self.column_list.setEnabled(True)
-        self.column_list.clear()
-        for i in range(len(colnames)):
-            item = QtGui.QListWidgetItem(colnames[i])
-            self.column_list.addItem(item)
-
-        # for idx, row in enumerate(__read_data(fname)):
-        #     if idx > 10: break
-        #     print row
-
-        def getValues(self):
-            pass
-
-    def activateButtons(self):
-        self.buttonBox.setEnabled(True)
+        self.tableWidget.setColumnCount(len(self.header))
+        self.tableWidget.setHorizontalHeaderLabels(self.header)
 
 
 
