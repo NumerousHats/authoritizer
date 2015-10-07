@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created: Mon Oct  5 13:41:31 2015
+# Created: Tue Oct  6 13:21:25 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -150,7 +150,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Authoritizer", None))
         item = self.match_table.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Nonstandard term", None))
         item = self.match_table.horizontalHeaderItem(1)

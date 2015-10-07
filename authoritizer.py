@@ -2,9 +2,11 @@ import sys
 from PyQt4 import QtCore, QtGui
 from mainwindow import Ui_MainWindow
 from rundialog import Ui_Dialog
+from importauthority import Ui_ImportAuthDialog
 
 import jellyfish
 import pandas as pd
+import unicodecsv as csv
 
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -29,6 +31,12 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
     def importAuth(self):
+        dlg = StartImportAuthDialog()
+        if dlg.exec_():
+            print "bong!"
+        else:
+            return
+
         df = pd.read_csv("testdat/huge_real_life.csv")
         self.authorities = df['canonical firm'].dropna().values.tolist()
         self.authorities = list(set(self.authorities))
@@ -81,7 +89,7 @@ class StartQT4(QtGui.QMainWindow):
             item = QtGui.QListWidgetItem(self.all_scores[row][i][0])
             self.ui.tophit_list.addItem(item)
 
-        if row != -1: # row gets set to -1 after deleteMatch(): ignore it and keep the old current_run
+        if row != -1: # row gets set to -1 after deleteMatch(): ignore it and keep the old current_row
             self.current_row = row
         
     def clickAssign(self, item):
@@ -101,6 +109,47 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.match_table.clearContents()
         self.updateTable()
         self.ui.match_table.setCurrentCell(self.current_row, 0)
+
+class StartImportAuthDialog(QtGui.QDialog, Ui_ImportAuthDialog):
+    def __init__(self,parent=None):
+        QtGui.QDialog.__init__(self,parent)
+        self.setupUi(self)
+
+        self.selectfile_button.clicked.connect(self.showDialog)
+        self.column_list.itemClicked.connect(self.activateButtons)
+
+    def showDialog(self):
+        fname = QtGui.QFileDialog.getOpenFileName(self, "Open file", "~")
+
+        def __read_data(path):
+            with open(path, 'rU') as data:
+                reader = csv.DictReader(data)
+                for row in reader:
+                    yield row
+
+        try:
+            colnames = __read_data(fname).next().keys()
+        except:
+            print "Yow! READ FAILED!"
+            return
+
+        self.column_list.setEnabled(True)
+        self.column_list.clear()
+        for i in range(len(colnames)):
+            item = QtGui.QListWidgetItem(colnames[i])
+            self.column_list.addItem(item)
+
+        # for idx, row in enumerate(__read_data(fname)):
+        #     if idx > 10: break
+        #     print row
+
+        def getValues(self):
+            pass
+
+    def activateButtons(self):
+        self.buttonBox.setEnabled(True)
+
+
 
 class StartRunDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self,parent=None):
