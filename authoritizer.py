@@ -47,27 +47,32 @@ class StartQT4(QtGui.QMainWindow):
                 QtGui.QMessageBox.warning(self, 'Warning', 'File does not appear to be valid CSV')
                 return
 
-            # it's okay, so reopen the file and pass reader to column selector dialog
+            # everything's okay, so reopen the file and read some sample data to pass to column selector dialog
 
             csv_fileh.close()
             csv_fileh = open(fname, 'rU')
-            self.reader = csv.DictReader(csv_fileh, dialect=dialect)
+            reader = csv.DictReader(csv_fileh, dialect=dialect)
+            self.sample = [ reader.next() for i in range(20) ]
 
-            dlg = StartSelectColumns()
+            dlg = StartSelectColumns(self)
             if dlg.exec_(): 
-                pass
-                # print "dialog got: {}".format(values)
+                selected_column = dlg.getValues()
             else:
                 return
 
-            # self.column_list.setEnabled(True)
-            # self.column_list.clear()
-            # for i in range(len(colnames)):
-            #     item = QtGui.QListWidgetItem(colnames[i])
-            #     self.column_list.addItem(item)
-            
+            # read the data from the selected column. reopen file for safety (even though it's absurdly inefficient)
 
+            csv_fileh.close()
+            csv_fileh = open(fname, 'rU')
+            reader = csv.DictReader(csv_fileh, dialect=dialect)
 
+            data = list()
+            for row in reader:
+                data.append(row[selected_column])
+
+            data = [i for i in data if i != ""]
+            data = list(set(data))
+            self.authorities = data
 
         elif file_extension == ".txt":
             QtGui.QMessageBox.information(self, 'Information', 'You got yourself a text file!')
@@ -78,12 +83,6 @@ class StartQT4(QtGui.QMainWindow):
         else:
             QtGui.QMessageBox.warning(self, 'Warning', 'I have no idea what that file is!')
             return
-
-        
-
-        return
-
-
 
         self.have_auth = True
 
@@ -104,7 +103,6 @@ class StartQT4(QtGui.QMainWindow):
         dlg = StartRunDialog() 
         if dlg.exec_(): 
             match_function = dlg.getValues() 
-            # print "dialog got: {}".format(values)
         else:
             return
 
@@ -154,18 +152,41 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.match_table.setCurrentCell(self.current_row, 0)
 
 class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
-    def __init__(self,parent=None):
-        QtGui.QDialog.__init__(self,parent)
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
         self.setupUi(self)
 
+        self.header = parent.header
+
         self.tableWidget.setColumnCount(len(self.header))
+        self.tableWidget.setRowCount(len(parent.sample))
         self.tableWidget.setHorizontalHeaderLabels(self.header)
+        self.tableWidget.cellClicked.connect(self.columnClicked)
+
+
+        for row in range(len(parent.sample)):
+            for column in range(len(self.header)):
+                if parent.sample[row][self.header[column]]:
+                    self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(parent.sample[row][self.header[column]]))
+
+
+    def columnClicked(self, row, column):
+        self.buttonBox.setEnabled(True)
+        self.current_column = column
+
+    def getValues(self):
+        return self.header[self.current_column]
+
+
+
+
+            
 
 
 
 class StartRunDialog(QtGui.QDialog, Ui_Dialog):
-    def __init__(self,parent=None):
-        QtGui.QDialog.__init__(self,parent)
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
         self.setupUi(self)
 
         self.lev_rb.toggled.connect(self.levToggled)
@@ -174,7 +195,13 @@ class StartRunDialog(QtGui.QDialog, Ui_Dialog):
         self.jarowink_rb.toggled.connect(self.jarowinkToggled)
         self.mrac_rb.toggled.connect(self.mracToggled)
 
-        self.jarowink_rb.click() # to make sure an event is generated for default
+        # lev_rb is selected by default within the .ui file,
+        # therefore the following line is guaranteed to generate
+        # a "toggled" event, and thereby makes sure that the default
+        # matching algorithm (jaro-winkler) is set even if the user
+        # doesn't actually click on anything
+
+        self.jarowink_rb.click()
 
     def levToggled(self, state):
         if state:
