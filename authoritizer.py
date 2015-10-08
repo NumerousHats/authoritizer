@@ -5,9 +5,7 @@ from selectcolumn import Ui_SelectcolsDialog
 from rundialog import Ui_Dialog
 
 import os
-
 import jellyfish
-import pandas as pd
 import unicodecsv as csv
 
 class StartQT4(QtGui.QMainWindow):
@@ -19,8 +17,10 @@ class StartQT4(QtGui.QMainWindow):
         self.have_auth = False
         self.have_mess = False
 
-        self.ui.actionImport_auth.triggered.connect(self.importAuth)
-        self.ui.actionImport_messy.triggered.connect(self.importMessy)
+        # use the trick from http://eli.thegreenplace.net/2011/04/25/passing-extra-arguments-to-pyqt-slot
+        # to use same callback for two menu items
+        self.ui.actionImport_auth.triggered.connect(lambda: self.importData("auth"))
+        self.ui.actionImport_messy.triggered.connect(lambda: self.importData("messy"))
         self.ui.actionRun_matching.triggered.connect(self.runMatching)
         # self.ui.actionExport_CSV.triggered.connect(self.exportCSV)
         self.ui.actionQuit.triggered.connect(QtCore.QCoreApplication.instance().quit)
@@ -32,7 +32,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.createAuthority_button.clicked.connect(self.createAuth)
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
-    def importAuth(self):
+    def importData(self, data_type):
         fname = str(QtGui.QFileDialog.getOpenFileName(self, "Open file", "~"))
         filename, file_extension = os.path.splitext(fname)
 
@@ -72,29 +72,26 @@ class StartQT4(QtGui.QMainWindow):
 
             data = [i for i in data if i != ""]
             data = list(set(data))
-            self.authorities = data
+ 
 
         elif file_extension == ".txt":
-            QtGui.QMessageBox.information(self, 'Information', 'You got yourself a text file!')
+            QtGui.QMessageBox.information(self, 'Information', 'Flat text import not yet supported.')
         elif file_extension == ".xlsx":
-            QtGui.QMessageBox.information(self, 'Information', 'You got yourself a Excel XML file!')
+            QtGui.QMessageBox.information(self, 'Information', 'Excel .xlsx import not yet supported')
         elif file_extension == ".xls":
-            QtGui.QMessageBox.information(self, 'Information', 'You got yourself an old-fashioned Excel file!')
+            QtGui.QMessageBox.information(self, 'Information', 'Excel .xls import not yet supported')
         else:
-            QtGui.QMessageBox.warning(self, 'Warning', 'I have no idea what that file is!')
+            QtGui.QMessageBox.warning(self, 'Warning', 'File type {} is not supported'.format(file_extension))
             return
 
-        self.have_auth = True
-
-        if self.have_auth and self.have_mess:
-            self.ui.actionRun_matching.setEnabled(True)
-
-    def importMessy(self):
-        df = pd.read_csv("testdat/huge_real_life.csv")
-        self.mess = df['vendor'].dropna().values.tolist()
-        self.mess = list(set(self.mess))
-        self.mess = [unicode(x) for x in self.mess]
-        self.have_mess = True
+        if data_type == "auth":
+            self.authorities = data
+            self.have_auth = True
+        elif data_type == "messy":
+            self.mess = data
+            self.have_mess = True
+        else:
+            QtGui.QMessageBox.critical(self, 'Warning', 'Internal error: importData received unexpected argument')
 
         if self.have_auth and self.have_mess:
             self.ui.actionRun_matching.setEnabled(True)
@@ -169,20 +166,12 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
                 if parent.sample[row][self.header[column]]:
                     self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(parent.sample[row][self.header[column]]))
 
-
     def columnClicked(self, row, column):
         self.buttonBox.setEnabled(True)
         self.current_column = column
 
     def getValues(self):
         return self.header[self.current_column]
-
-
-
-
-            
-
-
 
 class StartRunDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self, parent=None):
