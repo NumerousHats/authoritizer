@@ -146,6 +146,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.match_table.setRowCount(len(self.mess))
         self.ui.match_table.clearContents()
         self.updateTable()
+        self.ui.actionExport_CSV.setEnabled(True)
 
     def exportCSV(self):
         fname = QtGui.QFileDialog.getSaveFileNameAndFilter(self, 'Export CSV', '~', "*.csv")
