@@ -8,6 +8,7 @@ import os
 import jellyfish
 import unicodecsv as csv
 
+
 class StartQT4(QtGui.QMainWindow):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
@@ -17,18 +18,24 @@ class StartQT4(QtGui.QMainWindow):
         self.have_auth = False
         self.have_mess = False
 
+        ###############
+        ##### set up signals/slots
+        ###############
+
+        ##### menu items
+
         # use the trick from http://eli.thegreenplace.net/2011/04/25/passing-extra-arguments-to-pyqt-slot
         # to use same callback for two menu items
         self.ui.actionImport_auth.triggered.connect(lambda: self.importData("auth"))
         self.ui.actionImport_messy.triggered.connect(lambda: self.importData("messy"))
         self.ui.actionRun_matching.triggered.connect(self.runMatching)
-        # self.ui.actionExport_CSV.triggered.connect(self.exportCSV)
+        self.ui.actionExport_CSV.triggered.connect(self.exportCSV)
         self.ui.actionQuit.triggered.connect(QtCore.QCoreApplication.instance().quit)
 
+        ##### GUI elements
+
         self.ui.match_table.currentCellChanged.connect(self.updateTopHits)
-
         self.ui.tophit_list.itemDoubleClicked.connect(self.clickAssign)
-
         self.ui.createAuthority_button.clicked.connect(self.createAuth)
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
@@ -115,6 +122,18 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.match_table.setRowCount(len(self.mess))
         self.ui.match_table.clearContents()
         self.updateTable()
+
+    def exportCSV(self):
+        fname = QtGui.QFileDialog.getSaveFileNameAndFilter(self, 'Export CSV', '~', "*.csv")
+        print "got {}".format(fname)
+
+        with open(fname[0], 'wb') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(["Messy term", "Authority term"])
+
+            for i in range(len(self.mess)):
+                if self.matched_authorities[i]:
+                    csvwriter.writerow([self.mess[i], self.matched_authorities[i]])
 
     def updateTable(self):
         for row in range(len(self.mess)):
@@ -217,4 +236,21 @@ if __name__ == "__main__":
     myapp = StartQT4()
     myapp.show()
     sys.exit(app.exec_())
+
+
+
+# for future preference setting
+
+# from sys import platform as _platform
+
+# if _platform == "linux" or _platform == "linux2":
+#    # linux
+# elif _platform == "darwin":
+#    # MAC OS X
+# elif _platform == "win32":
+#    # Windows
+
+# windows prefs are in the Application Data folder for the user or for all users.
+# mac prefs are in /Users/username/Library/Preferences
+# linux prefs are in ~/.authoritizer
 
