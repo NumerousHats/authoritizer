@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'rundialog.ui'
 #
-# Created: Wed Oct  7 19:19:10 2015
+# Created: Wed Oct 14 15:56:16 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -59,6 +59,7 @@ class Ui_Dialog(object):
         self.buttonGroup.addButton(self.jarowink_rb)
         self.verticalLayout.addWidget(self.jarowink_rb)
         self.mrac_rb = QtGui.QRadioButton(self.layoutWidget)
+        self.mrac_rb.setEnabled(False)
         self.mrac_rb.setObjectName(_fromUtf8("mrac_rb"))
         self.buttonGroup.addButton(self.mrac_rb)
         self.verticalLayout.addWidget(self.mrac_rb)

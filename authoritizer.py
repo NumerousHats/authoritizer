@@ -3,6 +3,7 @@ from PyQt4 import QtCore, QtGui
 from mainwindow import Ui_MainWindow
 from selectcolumn import Ui_SelectcolsDialog
 from rundialog import Ui_Dialog
+from preferencesdialog import Ui_PreferencesDialog
 
 import os
 import jellyfish
@@ -30,6 +31,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.actionImport_messy.triggered.connect(lambda: self.importData("messy"))
         self.ui.actionRun_matching.triggered.connect(self.runMatching)
         self.ui.actionExport_CSV.triggered.connect(self.exportCSV)
+        self.ui.actionPreferences.triggered.connect(self.setPreferences)
         self.ui.actionQuit.triggered.connect(QtCore.QCoreApplication.instance().quit)
 
         ##### GUI elements
@@ -38,6 +40,11 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.tophit_list.itemDoubleClicked.connect(self.clickAssign)
         self.ui.createAuthority_button.clicked.connect(self.createAuth)
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
+
+        ###### default preferences
+
+        self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
+        self.display_similarity = True
 
     def importData(self, data_type):
         fname = str(QtGui.QFileDialog.getOpenFileName(self, "Open file", "~"))
@@ -106,9 +113,22 @@ class StartQT4(QtGui.QMainWindow):
     def runMatching(self):
         dlg = StartRunDialog() 
         if dlg.exec_(): 
-            match_function = dlg.getValues() 
+            match_method = dlg.getValues() 
         else:
             return
+
+        if match_method == "lev":
+            match_function = jellyfish.levenshtein_distance
+        elif match_method == "damlev":
+            match_function = jellyfish.damerau_levenshtein_distance
+        elif match_method == "jaro":
+            match_function = jellyfish.jaro_distance
+        elif match_method == "jarowink":
+            match_function = jellyfish.jaro_winkler
+        elif match_method == "mrac":
+            match_function = jellyfish.match_rating_comparison
+        else:
+            QtGui.QMessageBox.critical(self, 'Warning', 'Internal error: runMatching received unexpected argument')
 
         self.all_scores = list()
         self.matched_authorities = list()
@@ -117,7 +137,11 @@ class StartQT4(QtGui.QMainWindow):
             scores = [ [x, match_function(m, unicode(x))] for x in self.authorities ]
             scores = sorted(scores, key=lambda score: -score[1])[0:10]
             self.all_scores.append(scores)
-            self.matched_authorities.append(scores[0][0] if scores[0][1] > 0.6 else False)
+            cutoff = self.cutoffs[match_method]
+            if match_method == "lev" or match_method == "damlev":
+                self.matched_authorities.append(scores[0][0] if scores[0][1] < cutoff else False)
+            else:
+                self.matched_authorities.append(scores[0][0] if scores[0][1] > cutoff else False)
 
         self.ui.match_table.setRowCount(len(self.mess))
         self.ui.match_table.clearContents()
@@ -135,6 +159,16 @@ class StartQT4(QtGui.QMainWindow):
                 if self.matched_authorities[i]:
                     csvwriter.writerow([self.mess[i], self.matched_authorities[i]])
 
+    def setPreferences(self):
+        dlg = StartPreferences(self) 
+        if dlg.exec_(): 
+            preferences = dlg.getValues() 
+        else:
+            return
+
+        self.display_similarity = preferences["display_similarity"]
+        self.cutoffs = preferences["cutoffs"]
+
     def updateTable(self):
         for row in range(len(self.mess)):
             self.ui.match_table.setItem(row, 0, QtGui.QTableWidgetItem(self.mess[row]))
@@ -144,7 +178,10 @@ class StartQT4(QtGui.QMainWindow):
     def updateTopHits(self, row, column, oldrow, oldcolumn):
         self.ui.tophit_list.clear()
         for i in range(10):
-            item = QtGui.QListWidgetItem(self.all_scores[row][i][0])
+            text = self.all_scores[row][i][0]
+            if self.display_similarity:
+                text = "{} ({:.3})".format(text, float(self.all_scores[row][i][1]))
+            item = QtGui.QListWidgetItem(text)
             self.ui.tophit_list.addItem(item)
 
         if row != -1: # row gets set to -1 after deleteMatch(): ignore it and keep the old current_row
@@ -192,6 +229,29 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
     def getValues(self):
         return self.header[self.current_column]
 
+class StartPreferences(QtGui.QDialog, Ui_PreferencesDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.setupUi(self)
+
+        self.lev_cutoff.setValue(parent.cutoffs["lev"])
+        self.damlev_cutoff.setValue(parent.cutoffs["damlev"])
+        self.jaro_cutoff.setValue(parent.cutoffs["jaro"])
+        self.jarowink_cutoff.setValue(parent.cutoffs["jarowink"])
+        self.mrac_cutoff.setValue(parent.cutoffs["mrac"])
+
+        self.display_similarity.setChecked(parent.display_similarity)
+
+    def getValues(self):
+        cutoffs = {"lev": self.lev_cutoff.value(), 
+                    "damlev": self.damlev_cutoff.value(),
+                    "jaro": self.jaro_cutoff.value(),
+                    "jarowink": self.jarowink_cutoff.value(),
+                    "mrac": self.mrac_cutoff.value()}
+        prefs = {"display_similarity": self.display_similarity.isChecked(), "cutoffs": cutoffs}
+
+        return prefs
+
 class StartRunDialog(QtGui.QDialog, Ui_Dialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
@@ -213,19 +273,19 @@ class StartRunDialog(QtGui.QDialog, Ui_Dialog):
 
     def levToggled(self, state):
         if state:
-            self.distfun = jellyfish.levenshtein_distance
+            self.distfun = "lev"
     def damlevToggled(self, state):
         if state:
-            self.distfun = jellyfish.damerau_levenshtein_distance
+            self.distfun = "damlev"
     def jaroToggled(self, state):
         if state:
-            self.distfun = jellyfish.jaro_distance
+            self.distfun = 'jaro'
     def jarowinkToggled(self, state):
         if state:
-            self.distfun = jellyfish.jaro_winkler
+            self.distfun = "jarowink"
     def mracToggled(self, state):
         if state:
-            self.distfun = jellyfish.match_rating_comparison
+            self.distfun = "mrac"
 
     def getValues(self):
         return self.distfun

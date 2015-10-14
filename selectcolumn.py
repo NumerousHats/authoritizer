@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'selectcolumn.ui'
 #
-# Created: Wed Oct  7 19:19:10 2015
+# Created: Wed Oct 14 15:56:16 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!

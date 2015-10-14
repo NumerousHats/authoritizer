@@ -80,6 +80,9 @@
       </item>
       <item>
        <widget class="QRadioButton" name="mrac_rb">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Match Rating Approach Comparison</string>
         </property>
