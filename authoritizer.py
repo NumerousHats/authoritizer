@@ -2,12 +2,14 @@ import sys
 from PyQt4 import QtCore, QtGui
 from mainwindow import Ui_MainWindow
 from selectcolumn import Ui_SelectcolsDialog
+from selectsheet import Ui_SelectsheetDialog
 from rundialog import Ui_Dialog
 from preferencesdialog import Ui_PreferencesDialog
 
 import os
 import jellyfish
 import unicodecsv as csv
+import openpyxl
 
 
 class StartQT4(QtGui.QMainWindow):
@@ -90,10 +92,26 @@ class StartQT4(QtGui.QMainWindow):
 
         elif file_extension == ".txt":
             QtGui.QMessageBox.information(self, 'Information', 'Flat text import not yet supported.')
+            return
         elif file_extension == ".xlsx":
-            QtGui.QMessageBox.information(self, 'Information', 'Excel .xlsx import not yet supported')
+            wb = openpyxl.load_workbook(fname)
+            sheets = wb.get_sheet_names()
+            print sheets
+
+            dlg = StartSelectSheet(sheets)
+            if dlg.exec_(): 
+                selected_sheet = dlg.getValues()
+            else:
+                return
+
+            sheet = wb.get_sheet_by_name(selected_sheet)
+
+            # problem: need to get column headings somehow. can't assume first row is headings?
+
+            return
         elif file_extension == ".xls":
             QtGui.QMessageBox.information(self, 'Information', 'Excel .xls import not yet supported')
+            return
         else:
             QtGui.QMessageBox.warning(self, 'Warning', 'File type {} is not supported'.format(file_extension))
             return
@@ -229,6 +247,22 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
 
     def getValues(self):
         return self.header[self.current_column]
+
+
+class StartSelectSheet(QtGui.QDialog, Ui_SelectsheetDialog):
+    def __init__(self, sheets=None, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.setupUi(self)
+
+        for sheet in sheets:
+            item = QtGui.QListWidgetItem(sheet)
+            self.sheet_list.addItem(item)
+
+        self.sheet_list.setCurrentRow(0)
+
+    def getValues(self):
+        return self.sheet_list.currentItem().text()
+
 
 class StartPreferences(QtGui.QDialog, Ui_PreferencesDialog):
     def __init__(self, parent=None):

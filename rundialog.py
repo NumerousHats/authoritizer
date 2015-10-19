@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'rundialog.ui'
 #
-# Created: Wed Oct 14 15:56:16 2015
+# Created: Mon Oct 19 17:15:35 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
