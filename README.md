@@ -1,6 +1,6 @@
 #Authoritizer
 
-A GUI tool for reconciling messy data to a canonical list of authorized terms using fuzzy string matching**
+A GUI tool for reconciling messy data to a canonical list of authorized terms using fuzzy string matching
 
 ##Purpose
 Do you have list of names, tags, or other text data that may have been created by users of a website or survey respondents? Do they contain spelling errors, variant forms, or other inconsistencies? Do you want to interactively reconcile those text strings with a consistent list of "canonical" authorized terms using fuzzy string matching? Then Authoritizer is for you.
@@ -26,11 +26,11 @@ Here is how Authoritizer handles this type of problem:
 ###Launch the program
 ####From source
 Running Authoritizer from source requires the following dependencies:
-*Python 2.7 (not 3.x)
-*PyQt4
-*jellyfish
-*unicodecsv (for .csv import)
-*openpyxl (for .xslx import)
+* Python 2.7 (not 3.x)
+* PyQt4
+* jellyfish
+* unicodecsv (for .csv import)
+* openpyxl (for .xslx import)
 
 Once those are installed, you can run `python authoritizer.py` from your command prompt.
 
