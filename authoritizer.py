@@ -70,9 +70,11 @@ class StartQT4(QtGui.QMainWindow):
             reader = csv.DictReader(csv_fileh, dialect=dialect)
             self.sample = [ reader.next() for i in range(20) ]
 
+            print self.sample
+
             dlg = StartSelectColumns(self)
             if dlg.exec_(): 
-                selected_column = dlg.getValues()
+                selected_column = self.header[dlg.getValues()]
             else:
                 return
 
@@ -96,7 +98,6 @@ class StartQT4(QtGui.QMainWindow):
         elif file_extension == ".xlsx":
             wb = openpyxl.load_workbook(fname)
             sheets = wb.get_sheet_names()
-            print sheets
 
             dlg = StartSelectSheet(sheets)
             if dlg.exec_(): 
@@ -105,8 +106,19 @@ class StartQT4(QtGui.QMainWindow):
                 return
 
             sheet = wb.get_sheet_by_name(selected_sheet)
+            maxcol = sheet.get_highest_column()
+            self.header = [ str(i) for i in range(1, maxcol + 1) ]
+            self.sample = [ {self.header[j]:sheet.cell(row=i, column=j).value for j in range(maxcol)} for i in range(20)]
 
-            # problem: need to get column headings somehow. can't assume first row is headings?
+            print self.sample
+
+            dlg = StartSelectColumns(self)
+            if dlg.exec_(): 
+                selected_column = dlg.getValues()
+            else:
+                return
+
+            print "column {}".format(selected_column)
 
             return
         elif file_extension == ".xls":
@@ -168,7 +180,6 @@ class StartQT4(QtGui.QMainWindow):
 
     def exportCSV(self):
         fname = QtGui.QFileDialog.getSaveFileNameAndFilter(self, 'Export CSV', '~', "*.csv")
-        print "got {}".format(fname)
 
         with open(fname[0], 'wb') as csvfile:
             csvwriter = csv.writer(csvfile)
@@ -229,6 +240,7 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
         self.setupUi(self)
 
         self.header = parent.header
+        print self.header
 
         self.tableWidget.setColumnCount(len(self.header))
         self.tableWidget.setRowCount(len(parent.sample))
@@ -246,7 +258,7 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
         self.current_column = column
 
     def getValues(self):
-        return self.header[self.current_column]
+        return self.current_column
 
 
 class StartSelectSheet(QtGui.QDialog, Ui_SelectsheetDialog):
