@@ -43,7 +43,9 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.createAuthority_button.clicked.connect(self.createAuth)
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
-        ###### default preferences
+        ###############
+        ##### default preferences
+        ###############
 
         self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
         self.display_similarity = True
@@ -70,8 +72,6 @@ class StartQT4(QtGui.QMainWindow):
             reader = csv.DictReader(csv_fileh, dialect=dialect)
             self.sample = [ reader.next() for i in range(20) ]
 
-            print self.sample
-
             dlg = StartSelectColumns(self)
             if dlg.exec_(): 
                 selected_column = self.header[dlg.getValues()]
@@ -95,9 +95,15 @@ class StartQT4(QtGui.QMainWindow):
         elif file_extension == ".txt":
             QtGui.QMessageBox.information(self, 'Information', 'Flat text import not yet supported.')
             return
+
+
         elif file_extension == ".xlsx":
-            wb = openpyxl.load_workbook(fname)
-            sheets = wb.get_sheet_names()
+            try:
+                wb = openpyxl.load_workbook(fname)
+                sheets = wb.get_sheet_names()
+            except:
+                QtGui.QMessageBox.warning(self, 'Warning', 'File does not appear to be valid Excel spreadsheet')
+                return
 
             dlg = StartSelectSheet(sheets)
             if dlg.exec_(): 
@@ -110,17 +116,17 @@ class StartQT4(QtGui.QMainWindow):
             self.header = [ str(i) for i in range(1, maxcol + 1) ]
             self.sample = [ {self.header[j]:sheet.cell(row=i, column=j).value for j in range(maxcol)} for i in range(20)]
 
-            print self.sample
-
             dlg = StartSelectColumns(self)
             if dlg.exec_(): 
                 selected_column = dlg.getValues()
             else:
                 return
 
-            print "column {}".format(selected_column)
+            data = [ sheet.cell(row=i, column=selected_column).value for i in range(sheet.get_highest_row())]
+            data = [i for i in data if i] # get rid of empty cells
+            data = [i for i in data if i != ""] # perhaps not necessary?
+            data = list(set(data)) # get rid of duplicates
 
-            return
         elif file_extension == ".xls":
             QtGui.QMessageBox.information(self, 'Information', 'Excel .xls import not yet supported')
             return
@@ -135,7 +141,7 @@ class StartQT4(QtGui.QMainWindow):
             self.mess = data
             self.have_mess = True
         else:
-            QtGui.QMessageBox.critical(self, 'Warning', 'Internal error: importData received unexpected argument')
+            QtGui.QMessageBox.critical(self, 'Error', 'Internal error: importData received unexpected argument')
 
         if self.have_auth and self.have_mess:
             self.ui.actionRun_matching.setEnabled(True)
@@ -240,7 +246,6 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
         self.setupUi(self)
 
         self.header = parent.header
-        print self.header
 
         self.tableWidget.setColumnCount(len(self.header))
         self.tableWidget.setRowCount(len(parent.sample))
