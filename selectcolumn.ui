@@ -13,13 +13,13 @@
   <property name="windowTitle">
    <string>Select columns</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>21</y>
+     <y>22</y>
      <width>611</width>
-     <height>451</height>
+     <height>441</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -52,9 +52,19 @@
      </widget>
     </item>
     <item>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="text">
+       <string>The first non-empty row is a header</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QDialogButtonBox" name="buttonBox">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
