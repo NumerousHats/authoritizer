@@ -2,12 +2,22 @@ import sys
 from PyQt4 import QtCore, QtGui
 from mainwindow import Ui_MainWindow
 from selectcolumn import Ui_SelectcolsDialog
+from selectsheet import Ui_SelectsheetDialog
 from rundialog import Ui_Dialog
 from preferencesdialog import Ui_PreferencesDialog
 
 import os
 import jellyfish
 import unicodecsv as csv
+import openpyxl
+
+def cleanupImport(data, has_header):
+    #data = [str(i) for i in data if i] # need something like this to cast numbers into strings? but it breaks unicode!
+    data = [i for i in data if i != ""]
+    if has_header:
+        data = data[1:]
+    data = list(set(data))
+    return(data)
 
 
 class StartQT4(QtGui.QMainWindow):
@@ -41,7 +51,9 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.createAuthority_button.clicked.connect(self.createAuth)
         self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
-        ###### default preferences
+        ###############
+        ##### default preferences
+        ###############
 
         self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
         self.display_similarity = True
@@ -55,22 +67,15 @@ class StartQT4(QtGui.QMainWindow):
             try:
                 dialect = csv.Sniffer().sniff(csv_fileh.read(1024))
                 csv_fileh.seek(0)
-                reader = csv.DictReader(csv_fileh, dialect=dialect)
-                self.header = reader.next().keys()
+                reader = csv.reader(csv_fileh, dialect=dialect)
+                self.sample = [ reader.next() for i in range(20) ]
             except csv.Error:
                 QtGui.QMessageBox.warning(self, 'Warning', 'File does not appear to be valid CSV')
                 return
 
-            # everything's okay, so reopen the file and read some sample data to pass to column selector dialog
-
-            csv_fileh.close()
-            csv_fileh = open(fname, 'rU')
-            reader = csv.DictReader(csv_fileh, dialect=dialect)
-            self.sample = [ reader.next() for i in range(20) ]
-
             dlg = StartSelectColumns(self)
             if dlg.exec_(): 
-                selected_column = dlg.getValues()
+                selectcolumn_output = dlg.getValues()
             else:
                 return
 
@@ -78,22 +83,51 @@ class StartQT4(QtGui.QMainWindow):
 
             csv_fileh.close()
             csv_fileh = open(fname, 'rU')
-            reader = csv.DictReader(csv_fileh, dialect=dialect)
+            reader = csv.reader(csv_fileh, dialect=dialect)
 
             data = list()
             for row in reader:
-                data.append(row[selected_column])
+                data.append(row[selectcolumn_output["column"]])
+            data = cleanupImport(data, selectcolumn_output["header"])
 
-            data = [i for i in data if i != ""]
-            data = list(set(data))
- 
 
         elif file_extension == ".txt":
             QtGui.QMessageBox.information(self, 'Information', 'Flat text import not yet supported.')
+            return
+
+
         elif file_extension == ".xlsx":
-            QtGui.QMessageBox.information(self, 'Information', 'Excel .xlsx import not yet supported')
+            try:
+                wb = openpyxl.load_workbook(fname)
+                sheets = wb.get_sheet_names()
+            except:
+                QtGui.QMessageBox.warning(self, 'Warning', 'File does not appear to be valid Excel spreadsheet')
+                return
+
+            dlg = StartSelectSheet(sheets)
+            if dlg.exec_(): 
+                selected_sheet = dlg.getValues()
+            else:
+                return
+
+            sheet = wb.get_sheet_by_name(selected_sheet)
+            maxcol = sheet.get_highest_column()
+            self.sample = [ [str(sheet.cell(row=i, column=j).value) for j in range(maxcol)] for i in range(20)]
+
+            dlg = StartSelectColumns(self)
+            if dlg.exec_(): 
+                selectcolumn_output = dlg.getValues()
+            else:
+                return
+
+            data = [ sheet.cell(row=i, column=selectcolumn_output["column"]).value for i in range(sheet.get_highest_row())]
+            data = cleanupImport(data, selectcolumn_output["header"])
+
+            print data
+
         elif file_extension == ".xls":
             QtGui.QMessageBox.information(self, 'Information', 'Excel .xls import not yet supported')
+            return
         else:
             QtGui.QMessageBox.warning(self, 'Warning', 'File type {} is not supported'.format(file_extension))
             return
@@ -105,7 +139,7 @@ class StartQT4(QtGui.QMainWindow):
             self.mess = data
             self.have_mess = True
         else:
-            QtGui.QMessageBox.critical(self, 'Warning', 'Internal error: importData received unexpected argument')
+            QtGui.QMessageBox.critical(self, 'Error', 'Internal error: importData received unexpected argument')
 
         if self.have_auth and self.have_mess:
             self.ui.actionRun_matching.setEnabled(True)
@@ -150,7 +184,6 @@ class StartQT4(QtGui.QMainWindow):
 
     def exportCSV(self):
         fname = QtGui.QFileDialog.getSaveFileNameAndFilter(self, 'Export CSV', '~', "*.csv")
-        print "got {}".format(fname)
 
         with open(fname[0], 'wb') as csvfile:
             csvwriter = csv.writer(csvfile)
@@ -210,25 +243,40 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
         QtGui.QDialog.__init__(self, parent)
         self.setupUi(self)
 
-        self.header = parent.header
+        nrow = len(parent.sample)
+        ncol = len(parent.sample[0])
 
-        self.tableWidget.setColumnCount(len(self.header))
-        self.tableWidget.setRowCount(len(parent.sample))
-        self.tableWidget.setHorizontalHeaderLabels(self.header)
+        self.tableWidget.setColumnCount(ncol)
+        self.tableWidget.setRowCount(nrow)
         self.tableWidget.cellClicked.connect(self.columnClicked)
+        # self.tableWidget.click(0, 0) # this is wrong. need to find the right syntax
 
-
-        for row in range(len(parent.sample)):
-            for column in range(len(self.header)):
-                if parent.sample[row][self.header[column]]:
-                    self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(parent.sample[row][self.header[column]]))
+        for row in range(nrow):
+            for column in range(ncol):
+                if parent.sample[row][column]:
+                    self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(parent.sample[row][column]))
 
     def columnClicked(self, row, column):
-        self.buttonBox.setEnabled(True)
         self.current_column = column
 
     def getValues(self):
-        return self.header[self.current_column]
+        return {"column": self.current_column, "header": self.checkBox.isChecked()}
+
+
+class StartSelectSheet(QtGui.QDialog, Ui_SelectsheetDialog):
+    def __init__(self, sheets=None, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.setupUi(self)
+
+        for sheet in sheets:
+            item = QtGui.QListWidgetItem(sheet)
+            self.sheet_list.addItem(item)
+
+        self.sheet_list.setCurrentRow(0)
+
+    def getValues(self):
+        return self.sheet_list.currentItem().text()
+
 
 class StartPreferences(QtGui.QDialog, Ui_PreferencesDialog):
     def __init__(self, parent=None):

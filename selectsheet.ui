@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SelectcolsDialog</class>
- <widget class="QDialog" name="SelectcolsDialog">
+ <class>SelectsheetDialog</class>
+ <widget class="QDialog" name="SelectsheetDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>293</width>
+    <height>291</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Select columns</string>
+   <string>Dialog</string>
   </property>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>22</y>
-     <width>611</width>
-     <height>441</height>
+     <y>10</y>
+     <width>268</width>
+     <height>271</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -31,41 +31,15 @@
        </font>
       </property>
       <property name="text">
-       <string>Select column to import</string>
+       <string>Select sheet to import</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QTableWidget" name="tableWidget">
-      <property name="editTriggers">
-       <set>QAbstractItemView::NoEditTriggers</set>
-      </property>
-      <property name="selectionMode">
-       <enum>QAbstractItemView::SingleSelection</enum>
-      </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectColumns</enum>
-      </property>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="checkBox">
-      <property name="text">
-       <string>The first non-empty row is a header</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
+     <widget class="QListWidget" name="sheet_list"/>
     </item>
     <item>
      <widget class="QDialogButtonBox" name="buttonBox">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -82,12 +56,12 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>SelectcolsDialog</receiver>
+   <receiver>SelectsheetDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>248</x>
-     <y>429</y>
+     <y>254</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -98,12 +72,12 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>SelectcolsDialog</receiver>
+   <receiver>SelectsheetDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>316</x>
-     <y>429</y>
+     <y>260</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
