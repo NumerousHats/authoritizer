@@ -123,8 +123,6 @@ class StartQT4(QtGui.QMainWindow):
             data = [ sheet.cell(row=i, column=selectcolumn_output["column"]).value for i in range(sheet.get_highest_row())]
             data = cleanupImport(data, selectcolumn_output["header"])
 
-            print data
-
         elif file_extension == ".xls":
             QtGui.QMessageBox.information(self, 'Information', 'Excel .xls import not yet supported')
             return
@@ -255,6 +253,9 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
             for column in range(ncol):
                 if parent.sample[row][column]:
                     self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(parent.sample[row][column]))
+
+        self.tableWidget.setCurrentCell(0, 0)
+        self.current_column = 0
 
     def columnClicked(self, row, column):
         self.current_column = column
