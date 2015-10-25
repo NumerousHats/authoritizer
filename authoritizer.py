@@ -6,6 +6,7 @@ from selectsheet import Ui_SelectsheetDialog
 from rundialog import Ui_Dialog
 from preferencesdialog import Ui_PreferencesDialog
 
+import re
 import os
 import jellyfish
 import unicodecsv as csv
@@ -220,7 +221,12 @@ class StartQT4(QtGui.QMainWindow):
             self.current_row = row
         
     def clickAssign(self, item):
-        self.matched_authorities[self.current_row] = item.text()
+        # strip off trailing score if appended by updateTopHits
+        authority = str(item.text())
+        if self.display_similarity:
+            self.matched_authorities[self.current_row] = re.sub(r'\s\([0-9.]+\)$', '', authority)
+        else:
+            self.matched_authorities[self.current_row] = authority
         self.updateTable()
 
     def createAuth(self):
