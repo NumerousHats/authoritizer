@@ -60,7 +60,12 @@ class StartQT4(QtGui.QMainWindow):
         self.display_similarity = True
 
     def importData(self, data_type):
-        fname = str(QtGui.QFileDialog.getOpenFileName(self, "Open file", "~"))
+        if data_type == "auth":
+            window_name = "Import authorities"
+        elif data_type == "messy":
+            window_name = "Import nonstandard terms"
+        
+        fname = str(QtGui.QFileDialog.getOpenFileName(self, window_name, "~"))
         filename, file_extension = os.path.splitext(fname)
 
         if file_extension == ".csv":
