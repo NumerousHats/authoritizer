@@ -79,7 +79,7 @@ class StartQT4(QtGui.QMainWindow):
                 QtGui.QMessageBox.warning(self, 'Warning', 'File does not appear to be valid CSV')
                 return
 
-            dlg = StartSelectColumns(self)
+            dlg = StartSelectColumns(self, data_type)
             if dlg.exec_(): 
                 selectcolumn_output = dlg.getValues()
             else:
@@ -120,7 +120,7 @@ class StartQT4(QtGui.QMainWindow):
             maxcol = sheet.get_highest_column()
             self.sample = [ [str(sheet.cell(row=i, column=j).value) for j in range(maxcol)] for i in range(20)]
 
-            dlg = StartSelectColumns(self)
+            dlg = StartSelectColumns(self, data_type)
             if dlg.exec_(): 
                 selectcolumn_output = dlg.getValues()
             else:
@@ -248,17 +248,23 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.match_table.setCurrentCell(self.current_row, 0)
 
 class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent, type):
         QtGui.QDialog.__init__(self, parent)
         self.setupUi(self)
 
         nrow = len(parent.sample)
         ncol = len(parent.sample[0])
 
+        if type == "auth":
+            self.label.setText("Select column containing authorized terms")
+        elif type == "messy":
+            self.label.setText("Select column containing nonstandard terms")
+
+        
+
         self.tableWidget.setColumnCount(ncol)
         self.tableWidget.setRowCount(nrow)
         self.tableWidget.cellClicked.connect(self.columnClicked)
-        # self.tableWidget.click(0, 0) # this is wrong. need to find the right syntax
 
         for row in range(nrow):
             for column in range(ncol):

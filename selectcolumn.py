@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'selectcolumn.ui'
 #
-# Created: Fri Oct 23 17:39:09 2015
+# Created: Sun Oct 25 12:49:15 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -65,7 +65,7 @@ class Ui_SelectcolsDialog(object):
         QtCore.QMetaObject.connectSlotsByName(SelectcolsDialog)
 
     def retranslateUi(self, SelectcolsDialog):
-        SelectcolsDialog.setWindowTitle(_translate("SelectcolsDialog", "Select columns", None))
+        SelectcolsDialog.setWindowTitle(_translate("SelectcolsDialog", "Select column", None))
         self.label.setText(_translate("SelectcolsDialog", "Select column to import", None))
         self.checkBox.setText(_translate("SelectcolsDialog", "The first non-empty row is a header", None))
 
