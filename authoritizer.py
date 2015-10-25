@@ -57,7 +57,11 @@ class StartQT4(QtGui.QMainWindow):
         ###############
 
         self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
-        self.display_similarity = True
+        self.display_similarity = False
+
+        self.ui.statusBar.showMessage('Not ready: Import terms')
+        self.progbar = QtGui.QProgressBar(self.ui.statusBar)
+        self.ui.statusBar.addWidget(self.progbar)
 
     def importData(self, data_type):
         if data_type == "auth":
@@ -139,14 +143,19 @@ class StartQT4(QtGui.QMainWindow):
         if data_type == "auth":
             self.authorities = data
             self.have_auth = True
+            if not self.have_mess:
+                self.ui.statusBar.showMessage('Not ready: Import nonstandard terms')
         elif data_type == "messy":
             self.mess = data
             self.have_mess = True
+            if not self.have_auth:
+                self.ui.statusBar.showMessage('Not ready: Import authority terms')
         else:
             QtGui.QMessageBox.critical(self, 'Error', 'Internal error: importData received unexpected argument')
 
         if self.have_auth and self.have_mess:
             self.ui.actionRun_matching.setEnabled(True)
+            self.ui.statusBar.showMessage('Ready to run matching')
 
     def runMatching(self):
         dlg = StartRunDialog() 
