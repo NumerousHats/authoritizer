@@ -13,8 +13,6 @@ import jellyfish
 import unicodecsv as csv
 import openpyxl
 
-import time
-
 def cleanupImport(data, has_header):
     #data = [str(i) for i in data if i] # need something like this to cast numbers into strings? but it breaks unicode!
     data = [i for i in data if i != ""]
@@ -53,9 +51,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.match_table.currentCellChanged.connect(self.updateTopHits)
         self.ui.tophit_list.itemDoubleClicked.connect(self.clickAssign)
         self.ui.createAuthority_button.clicked.connect(self.createAuth)
-        # self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
-
-        self.ui.deleteAuthority_button.clicked.connect(self.progbarTest)
+        self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
 
         ###############
         ##### default preferences
@@ -176,27 +172,17 @@ class StartQT4(QtGui.QMainWindow):
         else:
             QtGui.QMessageBox.critical(self, 'Warning', 'Internal error: runMatching received unexpected argument')
 
-        if self.all_scores:
-            old_all_scores = self.all_scores
-            old_matched_authorities = self.matched_authorities
+        dlg = StartRunModal(self, match_function, match_method) 
+        if dlg.exec_(): 
+            self.all_scores, self.matched_authorities = dlg.getValues() 
+            self.ui.match_table.setRowCount(len(self.mess))
+            self.ui.match_table.clearContents()
+            self.updateTable()
+            self.ui.actionExport_CSV.setEnabled(True)
         else:
-            self.all_scores = list()
-            self.matched_authorities = list()
+            return
 
-        for m in self.mess: # ideally, we want a progress bar for this loop
-            scores = [ [x, match_function(m, unicode(x))] for x in self.authorities ]
-            scores = sorted(scores, key=lambda score: -score[1])[0:10]
-            self.all_scores.append(scores)
-            cutoff = self.cutoffs[match_method]
-            if match_method == "lev" or match_method == "damlev":
-                self.matched_authorities.append(scores[0][0] if scores[0][1] < cutoff else False)
-            else:
-                self.matched_authorities.append(scores[0][0] if scores[0][1] > cutoff else False)
 
-        self.ui.match_table.setRowCount(len(self.mess))
-        self.ui.match_table.clearContents()
-        self.updateTable()
-        self.ui.actionExport_CSV.setEnabled(True)
 
     def exportCSV(self):
         fname = QtGui.QFileDialog.getSaveFileNameAndFilter(self, 'Export CSV', '~', "*.csv")
@@ -371,12 +357,37 @@ class StartRunDialog(QtGui.QDialog, Ui_Dialog):
         return self.distfun
 
 
+class StartRunModal(QtGui.QDialog, Ui_RunModal):
+    def __init__(self, parent, match_function, match_method):
+        QtGui.QDialog.__init__(self, parent)
+        self.setupUi(self)
+
+        self.all_scores = list()
+        self.matched_authorities = list()
+
+        for m in parent.mess: # ideally, we want a progress bar for this loop
+            print m
+            scores = [ [x, match_function(m, unicode(x))] for x in parent.authorities ]
+            scores = sorted(scores, key=lambda score: -score[1])[0:10]
+            self.all_scores.append(scores)
+            cutoff = parent.cutoffs[match_method]
+            if match_method == "lev" or match_method == "damlev":
+                self.matched_authorities.append(scores[0][0] if scores[0][1] < cutoff else False)
+            else:
+                self.matched_authorities.append(scores[0][0] if scores[0][1] > cutoff else False)
+
+        self.accept()
+
+
+    def getValues(self):
+        return (self.all_scores, self.matched_authorities)
+
+
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     myapp = StartQT4()
     myapp.show()
     sys.exit(app.exec_())
-
 
 
 # for future preference setting
