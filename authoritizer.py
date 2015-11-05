@@ -5,12 +5,15 @@ from selectcolumn import Ui_SelectcolsDialog
 from selectsheet import Ui_SelectsheetDialog
 from rundialog import Ui_Dialog
 from preferencesdialog import Ui_PreferencesDialog
+from runmodal import Ui_RunModal
 
 import re
 import os
 import jellyfish
 import unicodecsv as csv
 import openpyxl
+
+import time
 
 def cleanupImport(data, has_header):
     #data = [str(i) for i in data if i] # need something like this to cast numbers into strings? but it breaks unicode!
@@ -50,7 +53,9 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.match_table.currentCellChanged.connect(self.updateTopHits)
         self.ui.tophit_list.itemDoubleClicked.connect(self.clickAssign)
         self.ui.createAuthority_button.clicked.connect(self.createAuth)
-        self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
+        # self.ui.deleteAuthority_button.clicked.connect(self.deleteMatch)
+
+        self.ui.deleteAuthority_button.clicked.connect(self.progbarTest)
 
         ###############
         ##### default preferences
@@ -59,9 +64,6 @@ class StartQT4(QtGui.QMainWindow):
         self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
         self.display_similarity = False
 
-        self.ui.statusBar.showMessage('Not ready: Import terms')
-        self.progbar = QtGui.QProgressBar(self.ui.statusBar)
-        self.ui.statusBar.addWidget(self.progbar)
 
     def importData(self, data_type):
         if data_type == "auth":
@@ -143,20 +145,17 @@ class StartQT4(QtGui.QMainWindow):
         if data_type == "auth":
             self.authorities = data
             self.have_auth = True
-            if not self.have_mess:
-                self.ui.statusBar.showMessage('Not ready: Import nonstandard terms')
+ 
         elif data_type == "messy":
             self.mess = data
             self.have_mess = True
-            if not self.have_auth:
-                self.ui.statusBar.showMessage('Not ready: Import authority terms')
+
         else:
             QtGui.QMessageBox.critical(self, 'Error', 'Internal error: importData received unexpected argument')
 
         if self.have_auth and self.have_mess:
             self.ui.actionRun_matching.setEnabled(True)
-            self.ui.statusBar.showMessage('Ready to run matching')
-
+ 
     def runMatching(self):
         dlg = StartRunDialog() 
         if dlg.exec_(): 
@@ -177,8 +176,12 @@ class StartQT4(QtGui.QMainWindow):
         else:
             QtGui.QMessageBox.critical(self, 'Warning', 'Internal error: runMatching received unexpected argument')
 
-        self.all_scores = list()
-        self.matched_authorities = list()
+        if self.all_scores:
+            old_all_scores = self.all_scores
+            old_matched_authorities = self.matched_authorities
+        else:
+            self.all_scores = list()
+            self.matched_authorities = list()
 
         for m in self.mess: # ideally, we want a progress bar for this loop
             scores = [ [x, match_function(m, unicode(x))] for x in self.authorities ]
@@ -255,6 +258,7 @@ class StartQT4(QtGui.QMainWindow):
         self.ui.match_table.clearContents()
         self.updateTable()
         self.ui.match_table.setCurrentCell(self.current_row, 0)
+
 
 class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
     def __init__(self, parent, type):

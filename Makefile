@@ -1,4 +1,4 @@
-all: mainwindow rundialog selectcolumn preferencesdialog selectsheet
+all: mainwindow rundialog selectcolumn preferencesdialog selectsheet runmodal
 
 mainwindow: mainwindow.ui
 	pyuic4 mainwindow.ui -o mainwindow.py
@@ -14,3 +14,6 @@ preferencesdialog: preferencesdialog.ui
 
 selectsheet: selectsheet.ui
 	pyuic4 selectsheet.ui -o selectsheet.py
+
+runmodal: runmodal.ui
+	pyuic4 runmodal.ui -o runmodal.py
