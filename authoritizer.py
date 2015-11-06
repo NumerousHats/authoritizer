@@ -169,13 +169,13 @@ class StartQT4(QtGui.QMainWindow):
         else:
             QtGui.QMessageBox.critical(self, 'Warning', 'Internal error: runMatching received unexpected argument')
 
-        self.all_scores = list()
-        self.matched_authorities = list()
+        temp_scores = list()
+        temp_matched = list()
 
         progress = QtGui.QProgressDialog("Running matches", "Stop", 0, len(self.mess), self)
         progress.setWindowModality(QtCore.Qt.WindowModal)
         progress.setMinimumDuration(0)
-        
+
         prog_value = 0
         for m in self.mess:
             prog_value += 1
@@ -183,12 +183,20 @@ class StartQT4(QtGui.QMainWindow):
             if progress.wasCanceled(): break
             scores = [ [x, match_function(m, unicode(x))] for x in self.authorities ]
             scores = sorted(scores, key=lambda score: -score[1])[0:10]
-            self.all_scores.append(scores)
+            temp_scores.append(scores)
             cutoff = self.cutoffs[match_method]
             if match_method == "lev" or match_method == "damlev":
-                self.matched_authorities.append(scores[0][0] if scores[0][1] < cutoff else False)
+                temp_matched.append(scores[0][0] if scores[0][1] < cutoff else False)
             else:
-                self.matched_authorities.append(scores[0][0] if scores[0][1] > cutoff else False)
+                temp_matched.append(scores[0][0] if scores[0][1] > cutoff else False)
+
+        if progress.wasCanceled(): 
+            progress.deleteLater()
+            return
+
+        progress.deleteLater()
+        self.all_scores = temp_scores
+        self.matched_authorities = temp_matched
 
         self.ui.match_table.setRowCount(len(self.mess))
         self.ui.match_table.clearContents()
