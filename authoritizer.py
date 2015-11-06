@@ -59,10 +59,6 @@ class StartQT4(QtGui.QMainWindow):
         self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
         self.display_similarity = False
 
-        self.ui.statusBar.showMessage('Not ready: Import terms')
-        self.progbar = QtGui.QProgressBar(self.ui.statusBar)
-        self.ui.statusBar.addWidget(self.progbar)
-
     def importData(self, data_type):
         if data_type == "auth":
             window_name = "Import authorities"
@@ -143,19 +139,15 @@ class StartQT4(QtGui.QMainWindow):
         if data_type == "auth":
             self.authorities = data
             self.have_auth = True
-            if not self.have_mess:
-                self.ui.statusBar.showMessage('Not ready: Import nonstandard terms')
+
         elif data_type == "messy":
             self.mess = data
             self.have_mess = True
-            if not self.have_auth:
-                self.ui.statusBar.showMessage('Not ready: Import authority terms')
         else:
             QtGui.QMessageBox.critical(self, 'Error', 'Internal error: importData received unexpected argument')
 
         if self.have_auth and self.have_mess:
             self.ui.actionRun_matching.setEnabled(True)
-            self.ui.statusBar.showMessage('Ready to run matching')
 
     def runMatching(self):
         dlg = StartRunDialog() 
@@ -180,7 +172,15 @@ class StartQT4(QtGui.QMainWindow):
         self.all_scores = list()
         self.matched_authorities = list()
 
-        for m in self.mess: # ideally, we want a progress bar for this loop
+        progress = QtGui.QProgressDialog("Running matches", "Stop", 0, len(self.mess), self)
+        progress.setWindowModality(QtCore.Qt.WindowModal)
+        progress.setMinimumDuration(0)
+        
+        prog_value = 0
+        for m in self.mess:
+            prog_value += 1
+            progress.setValue(prog_value)
+            if progress.wasCanceled(): break
             scores = [ [x, match_function(m, unicode(x))] for x in self.authorities ]
             scores = sorted(scores, key=lambda score: -score[1])[0:10]
             self.all_scores.append(scores)
