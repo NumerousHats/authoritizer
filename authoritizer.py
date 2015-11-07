@@ -57,7 +57,7 @@ class StartQT4(QtGui.QMainWindow):
         ###############
 
         self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
-        self.display_similarity = True
+        self.display_similarity = False
 
     def importData(self, data_type):
         if data_type == "auth":
@@ -139,6 +139,7 @@ class StartQT4(QtGui.QMainWindow):
         if data_type == "auth":
             self.authorities = data
             self.have_auth = True
+
         elif data_type == "messy":
             self.mess = data
             self.have_mess = True
@@ -168,18 +169,34 @@ class StartQT4(QtGui.QMainWindow):
         else:
             QtGui.QMessageBox.critical(self, 'Warning', 'Internal error: runMatching received unexpected argument')
 
-        self.all_scores = list()
-        self.matched_authorities = list()
+        temp_scores = list()
+        temp_matched = list()
 
-        for m in self.mess: # ideally, we want a progress bar for this loop
+        progress = QtGui.QProgressDialog("Running matches", "Stop", 0, len(self.mess), self)
+        progress.setWindowModality(QtCore.Qt.WindowModal)
+        progress.setMinimumDuration(0)
+
+        prog_value = 0
+        for m in self.mess:
+            prog_value += 1
+            progress.setValue(prog_value)
+            if progress.wasCanceled(): break
             scores = [ [x, match_function(m, unicode(x))] for x in self.authorities ]
             scores = sorted(scores, key=lambda score: -score[1])[0:10]
-            self.all_scores.append(scores)
+            temp_scores.append(scores)
             cutoff = self.cutoffs[match_method]
             if match_method == "lev" or match_method == "damlev":
-                self.matched_authorities.append(scores[0][0] if scores[0][1] < cutoff else False)
+                temp_matched.append(scores[0][0] if scores[0][1] < cutoff else False)
             else:
-                self.matched_authorities.append(scores[0][0] if scores[0][1] > cutoff else False)
+                temp_matched.append(scores[0][0] if scores[0][1] > cutoff else False)
+
+        if progress.wasCanceled(): 
+            progress.deleteLater()
+            return
+
+        progress.deleteLater()
+        self.all_scores = temp_scores
+        self.matched_authorities = temp_matched
 
         self.ui.match_table.setRowCount(len(self.mess))
         self.ui.match_table.clearContents()
