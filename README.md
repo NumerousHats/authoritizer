@@ -20,7 +20,7 @@ In addition, all of the above software only provides the "best match" linkage be
 Suppose we have a set of company names that were listed by respondents to a survey. Some of these companies are publicly traded, and some are not. In addition, this list may have misspellings or may be written differently from the official name of the company as listed on the stock exchange. We also have a list of publicly traded US companies, containing their official names, ticker symbols, and other business information. We wish to reconcile the nonstandard "messy" survey data with the authorized "canonical" list of official company names.
 
 Here is how `authoritizer` handles this type of problem:
-![screenshot]()
+![screenshot](https://github.com/MAndrecPhD/authoritizer/blob/develop/screen-shot.png)
 
 ##Usage
 ###Launch the program
@@ -38,14 +38,14 @@ Once those are installed, you can run `python authoritizer.py` from your command
 Users of Windows 7 and higher can simply double-click on the executable in the `/dist` directory of the git repository. Depending on your system configuration, you may receive warnings about untrusted software...
 
 ###Import data
+The authorized and non-standard terms that are to be matched can currently be imported from a CSV file or Excel `.xlsx` file (`File->Import Authorities...` and `File->Import Nonstandard terms...`).
 
 ###Run matching
+Once both authorized and non-standard terms have been loaded, matching can be run via `Run->Match...`. Note that matching is run all-against-all. No "blocking" (e.g. as in [this work](http://datamining.anu.edu.au/publications/2003/kdd03-6pages.pdf)) is done. Therefore, this may be impractical for very large term sets. Both the authorized and non-standard terms are deduplicated prior to matching.
 
 ###Interactively chose and/or confirm matchings
+After the matching is complete, the user can review the matches, which appear in the "match table" on the left portion of the window. Authority terms which match better than a given cutoff (which can be adjusted in `Preferences`) are automatically pre-populated into the "match table". Clicking on any row in the "match table" will display the 10 closest matches to that non-standard term in the "matched authorities" box in the upper right. Matches can be manually adjusted by double-clicking on a term in the "matched authorities" box, entering an arbitrary new authority term, or deleting an existing match.
 
 ###Export matchings to a CSV file
+The matches in the "match table" can be exported to a CSV file using `File->Export CSV...`. Saving the results of a matching run so that the interactive adjustment of matches can be re-started is not yet implemented.
 
-
-
-##Known bugs:
-* Font size issue in the "Matched authorities" box. It's either too small for MacOS, or too big for Windows.
