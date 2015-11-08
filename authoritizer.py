@@ -66,6 +66,8 @@ class StartQT4(QtGui.QMainWindow):
             window_name = "Import nonstandard terms"
         
         fname = str(QtGui.QFileDialog.getOpenFileName(self, window_name, "~"))
+        if fname == "": return
+        
         filename, file_extension = os.path.splitext(fname)
 
         if file_extension == ".csv":
