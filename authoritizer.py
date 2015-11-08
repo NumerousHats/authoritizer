@@ -67,7 +67,7 @@ class StartQT4(QtGui.QMainWindow):
         
         fname = str(QtGui.QFileDialog.getOpenFileName(self, window_name, "~"))
         if fname == "": return
-        
+
         filename, file_extension = os.path.splitext(fname)
 
         if file_extension == ".csv":
@@ -277,13 +277,12 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
         if type == "auth":
             self.label.setText("Select column containing authorized terms")
         elif type == "messy":
-            self.label.setText("Select column containing nonstandard terms")
-
-        
+            self.label.setText("Select column containing nonstandard terms")        
 
         self.tableWidget.setColumnCount(ncol)
         self.tableWidget.setRowCount(nrow)
         self.tableWidget.cellClicked.connect(self.columnClicked)
+        self.tableWidget.cellDoubleClicked.connect(self.columnDoubleClicked)
 
         for row in range(nrow):
             for column in range(ncol):
@@ -295,6 +294,10 @@ class StartSelectColumns(QtGui.QDialog, Ui_SelectcolsDialog):
 
     def columnClicked(self, row, column):
         self.current_column = column
+
+    def columnDoubleClicked(self, row, column):
+        self.current_column = column
+        self.accept()
 
     def getValues(self):
         return {"column": self.current_column, "header": self.checkBox.isChecked()}
