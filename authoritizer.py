@@ -58,6 +58,7 @@ class StartQT4(QtGui.QMainWindow):
 
         self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
         self.display_similarity = False
+        self.current_directory = "~"
 
     def importData(self, data_type):
         if data_type == "auth":
@@ -65,10 +66,12 @@ class StartQT4(QtGui.QMainWindow):
         elif data_type == "messy":
             window_name = "Import nonstandard terms"
         
-        fname = str(QtGui.QFileDialog.getOpenFileName(self, window_name, "~"))
+        fname = str(QtGui.QFileDialog.getOpenFileName(self, window_name, self.current_directory))
         if fname == "": return
 
         filename, file_extension = os.path.splitext(fname)
+        path = os.path.split(fname)
+        self.current_directory = path[0]
 
         if file_extension == ".csv":
             csv_fileh = open(fname, 'rU')
