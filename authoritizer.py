@@ -5,6 +5,7 @@ from selectcolumn import Ui_SelectcolsDialog
 from selectsheet import Ui_SelectsheetDialog
 from rundialog import Ui_Dialog
 from preferencesdialog import Ui_PreferencesDialog
+from start import Ui_StartDialog
 
 import re
 import os
@@ -59,6 +60,12 @@ class StartQT4(QtGui.QMainWindow):
         self.cutoffs = {"lev": 10, "damlev": 10, "jaro": 0.6, "jarowink": 0.6, "mrac": 9999}
         self.display_similarity = False
         self.current_directory = "~"
+
+        dlg = StartStartDialog() 
+        if dlg.exec_(): 
+            match_method = dlg.getValues() 
+        else:
+            return
 
     def importData(self, data_type):
         if data_type == "auth":
@@ -378,6 +385,14 @@ class StartRunDialog(QtGui.QDialog, Ui_Dialog):
     def mracToggled(self, state):
         if state:
             self.distfun = "mrac"
+
+    def getValues(self):
+        return self.distfun
+
+class StartStartDialog(QtGui.QDialog, Ui_StartDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.setupUi(self)
 
     def getValues(self):
         return self.distfun
