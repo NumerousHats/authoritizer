@@ -11,16 +11,19 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Load Terms...</string>
+   <string>Load and Run</string>
+  </property>
+  <property name="options">
+   <set>QWizard::CancelButtonOnLeft</set>
   </property>
   <widget class="QWizardPage" name="wizardPage1">
    <property name="title">
     <string>Load Authorized Terms</string>
    </property>
    <property name="subTitle">
-    <string>Select a file containing the list of authorized terms. This can be a newline-delimited text file, a CSV file, or an Excel spreadsheet.</string>
+    <string>Select a file containing the list of authorized terms. This can be a CSV file or an Excel spreadsheet.</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -48,11 +51,17 @@
    </widget>
   </widget>
   <widget class="QWizardPage" name="wizardPage2">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="title">
     <string>Load Non-Standard Terms</string>
    </property>
    <property name="subTitle">
-    <string>Select a file containing the list of non-standard terms. This can be a newline-delimited text file, a CSV file, or an Excel spreadsheet.</string>
+    <string>Select a file containing the list of non-standard terms. This can be a CSV file or an Excel spreadsheet.</string>
    </property>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
@@ -81,7 +90,202 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWizardPage" name="wizardPage3"/>
+  <widget class="QWizardPage" name="wizardPage3">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="title">
+    <string>Run Matching</string>
+   </property>
+   <widget class="QCheckBox" name="display_similarity">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>350</y>
+      <width>344</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Display similarity measures in matched authority list</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>10</y>
+      <width>341</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Select the text similarity matching algorithm to run. The numerical values in the boxes are the similarity measure values at which matces will be auto-filled. No matches are discarded, and can be manually inserted later.</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>110</y>
+      <width>337</width>
+      <height>192</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QRadioButton" name="lev_rb">
+         <property name="text">
+          <string>Levenshtein Distance</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="lev_cutoff">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QRadioButton" name="damlev_rb">
+         <property name="text">
+          <string>Damerau-Levenshtein Distance</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="damlev_cutoff">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QRadioButton" name="jaro_rb">
+         <property name="text">
+          <string>Jaro Distance</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="jaro_cutoff">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.050000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QRadioButton" name="jarowink_rb">
+         <property name="text">
+          <string>Jaro-Winkler Distance</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="jarowink_cutoff">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="maximum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.050000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QRadioButton" name="mrac_rb">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Match Rating Approach Comparison</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="mrac_cutoff">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
  </widget>
  <resources/>
  <connections/>
